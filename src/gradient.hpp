@@ -8,7 +8,7 @@
 
 namespace AutoGrad {
   template<FloatingPoint Scalar>
-  class Variable;
+  class Variable; // Forward declaration
 
   template<FloatingPoint Scalar>
   class Gradient {
@@ -26,7 +26,7 @@ namespace AutoGrad {
     Tape<Scalar> &tape;
     std::vector<Scalar> gradients;
 
-    Gradient(Tape<Scalar> &tape_, std::vector<Scalar> gradients_) : tape(tape_), gradients(gradients_) {};
+    Gradient(Tape<Scalar> &tape_, std::vector<Scalar> gradients_) : tape(tape_), gradients(gradients_) {}; // Constructor
   };
 }
 

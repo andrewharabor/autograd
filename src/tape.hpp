@@ -9,10 +9,10 @@
 
 namespace AutoGrad {
   template<FloatingPoint Scalar>
-  class Variable;
+  class Variable; // Forward declaration
 
   template<FloatingPoint Scalar>
-  class Gradient;
+  class Gradient; // Forward declaration
 
   template<FloatingPoint Scalar>
   class Tape {
@@ -179,6 +179,16 @@ namespace AutoGrad {
     friend Variable<S> abs(const Variable<S> &variable);
 
   public:
+    Tape() = default; // Default constructor
+
+    // Disallow copy semantics
+    Tape(const Tape<Scalar> &tape) = delete; // Copy constructor
+    Tape<Scalar> &operator=(const Tape<Scalar> &tape) = delete; // Copy assignment operator
+
+    // But allow move semantics
+    Tape(Tape<Scalar> &&tape) = default; // Move constructor
+    Tape<Scalar> &operator=(Tape<Scalar> &&tape) = default; // Move assignment operator
+
     Variable<Scalar> variable(Scalar value) {
       return Variable<Scalar>(*this, value, push_back());
     }

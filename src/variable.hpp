@@ -10,10 +10,10 @@
 
 namespace AutoGrad {
   template<FloatingPoint Scalar>
-  class Tape;
+  class Tape; // Forward declaration
 
   template<FloatingPoint Scalar>
-  class Gradient;
+  class Gradient; // Forward declaration
 
   template<FloatingPoint Scalar>
   class Variable {
@@ -304,9 +304,15 @@ namespace AutoGrad {
     }
 
   public:
-    Variable(const Variable<Scalar> &variable) : tape(variable.tape), val{variable.val} {
+    Variable(const Variable<Scalar> &variable) : tape(variable.tape), val{variable.val} {  // Copy constructor
       index = tape.push_back(1.0, variable.index);
     }
+
+    Variable(Variable<Scalar> &&variable) = default; // Move constructor
+
+    // Disallow reassignment operations
+    Variable<Scalar> &operator=(const Variable<Scalar> &variable) = delete; // Copy assignment operator
+    Variable<Scalar> &operator=(Variable<Scalar> &&variable) = delete; // Move assignment operator
 
     Scalar value() const {
       return val;
@@ -329,7 +335,7 @@ namespace AutoGrad {
     Scalar val;
     size_t index;
 
-    Variable(Tape<Scalar> &tape_, Scalar value_, size_t index_) : tape(tape_), val{value_}, index{index_} {}
+    Variable(Tape<Scalar> &tape_, Scalar value_, size_t index_) : tape(tape_), val{value_}, index{index_} {} // Constructor
   };
 }
 
