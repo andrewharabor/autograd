@@ -14,10 +14,16 @@ namespace AutoGrad {
   template<FloatingPoint Scalar>
   class Gradient; // Forward declaration
 
+  /* A gradient tape that stores a computational graph recording mathematical operations perfomed on variables in order
+  to compute derivatives. */
   template<FloatingPoint Scalar>
   class Tape {
     friend class Variable<Scalar>;
     friend class Gradient<Scalar>;
+
+    // A bunch of arithmetic operations and elementary mathematical functions that have to be declared as friends so
+    // that they can access private members and methods.
+    // I know it's ugly but I don't think there is another option aside from making class internals public.
 
     template<FloatingPoint S>
     friend Variable<S> operator+(const Variable<S> &variable1, const Variable<S> &variable2);
@@ -179,6 +185,7 @@ namespace AutoGrad {
     friend Variable<S> abs(const Variable<S> &variable);
 
   public:
+    /* Construct a new tape object. */
     Tape() = default; // Default constructor
 
     // Disallow copy semantics
@@ -186,28 +193,36 @@ namespace AutoGrad {
     Tape<Scalar> &operator=(const Tape<Scalar> &tape) = delete; // Copy assignment operator
 
     // But allow move semantics
+
+    /* Construct a new tape object by moving the given one. */
     Tape(Tape<Scalar> &&tape) = default; // Move constructor
+
+    /* Assign a new tape by moving the given one. */
     Tape<Scalar> &operator=(Tape<Scalar> &&tape) = default; // Move assignment operator
 
+    /* Instantiate a new variable object (that is permanently bound to the tape) as part of the computational graph. */
     Variable<Scalar> variable(Scalar value) {
       return Variable<Scalar>(*this, value, push_back());
     }
 
   private:
-    std::vector<Node<Scalar>> nodes;
+    std::vector<Node<Scalar>> nodes; // Internal representation of the computational graph.
 
+    /* Add an empty node to the computational graph that represents a new variable. */
     size_t push_back() {
       size_t size = nodes.size();
       nodes.push_back(Node<Scalar>(std::make_pair(0.0, 0.0), std::make_pair(size, size)));
       return size;
     }
 
+    /* Add a node to the computational graph that stores the result of a unary operation. */
     size_t push_back(Scalar weight, size_t dependency) {
       size_t size = nodes.size();
       nodes.push_back(Node<Scalar>(std::make_pair(weight, 0.0), std::make_pair(dependency, size)));
       return size;
     }
 
+    /* Add a node to the computational graph that stores the result of a binary operation. */
     size_t push_back(Scalar weight1, size_t dependency1, Scalar weight2, size_t dependency2) {
       size_t size = nodes.size();
       nodes.push_back(Node<Scalar>(std::make_pair(weight1, weight2), std::make_pair(dependency1, dependency2)));
