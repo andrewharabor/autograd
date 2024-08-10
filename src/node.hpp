@@ -24,7 +24,7 @@ namespace AutoGrad {
     std::pair<size_t, size_t> dependencies; // Indices to parent nodes in the computational graph.
 
     /* Construct a node object from a set of weights and dependencies. */
-    Node(std::pair<Scalar, Scalar> weights_, std::pair<size_t, size_t> dependencies_) : weights(weights_), dependencies(dependencies_) {}; // Constructor
+    Node(std::pair<Scalar, Scalar> weights_, std::pair<size_t, size_t> dependencies_) noexcept : weights(weights_), dependencies(dependencies_) {}; // Constructor
   };
 }
 

@@ -31,7 +31,7 @@ namespace AutoGrad {
     std::vector<Scalar> gradients; // Partial derivatives w.r.t each input variable.
 
     /* Construct a gradient object for a particular tape given the gradients. */
-    Gradient(Tape<Scalar> &tape_, std::vector<Scalar> gradients_) : tape(tape_), gradients(gradients_) {}; // Constructor
+    Gradient(Tape<Scalar> &tape_, std::vector<Scalar> gradients_) noexcept : tape(tape_), gradients(gradients_) {}; // Constructor
   };
 }
 

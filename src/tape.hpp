@@ -35,9 +35,6 @@ namespace AutoGrad {
     friend Variable<S> operator+(S scalar, const Variable<S> &variable);
 
     template<FloatingPoint S>
-    friend Variable<S> operator+(const Variable<S> &variable);
-
-    template<FloatingPoint S>
     friend Variable<S> operator-(const Variable<S> &variable1, const Variable<S> &variable2);
 
     template<FloatingPoint S>
@@ -45,9 +42,6 @@ namespace AutoGrad {
 
     template<FloatingPoint S>
     friend Variable<S> operator-(S scalar, const Variable<S> &variable);
-
-    template<FloatingPoint S>
-    friend Variable<S> operator-(const Variable<S> &variable);
 
     template<FloatingPoint S>
     friend Variable<S> operator*(const Variable<S> &variable1, const Variable<S> &variable2);
@@ -186,19 +180,19 @@ namespace AutoGrad {
 
   public:
     /* Construct a new tape object. */
-    Tape() = default; // Default constructor
+    Tape() noexcept = default; // Default constructor
 
     // Disallow copy semantics
-    Tape(const Tape<Scalar> &tape) = delete; // Copy constructor
-    Tape<Scalar> &operator=(const Tape<Scalar> &tape) = delete; // Copy assignment operator
+    Tape(const Tape<Scalar> &tape) noexcept = delete; // Copy constructor
+    Tape<Scalar> &operator=(const Tape<Scalar> &tape) noexcept = delete; // Copy assignment operator
 
     // But allow move semantics
 
     /* Construct a new tape object by moving the given one. */
-    Tape(Tape<Scalar> &&tape) = default; // Move constructor
+    Tape(Tape<Scalar> &&tape) noexcept = default; // Move constructor
 
     /* Assign a new tape by moving the given one. */
-    Tape<Scalar> &operator=(Tape<Scalar> &&tape) = default; // Move assignment operator
+    Tape<Scalar> &operator=(Tape<Scalar> &&tape) noexcept = default; // Move assignment operator
 
     /* Instantiate a new variable object (that is permanently bound to the tape) as part of the computational graph. */
     Variable<Scalar> variable(Scalar value) {
