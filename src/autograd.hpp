@@ -97,7 +97,7 @@ namespace AutoGrad {
     return Variable<S>(variable.tape, scalar / variable.val, variable.tape.push_back(-scalar / (variable.val * variable.val), variable.index));
   }
 
-  // Exponentiation and logarithmic operations
+  // Exponentiation and logarithmic functions
 
   /* Exponentiation (powers). */
   template<FloatingPoint S>
