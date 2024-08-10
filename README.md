@@ -33,7 +33,7 @@ git clone git@github.com:andrewharabor/autograd.git
 3. Make sure to tell the compiler where to look for the header file. For example, with `g++`/`gcc`, pass the following flag:
 
 ``` bash
--I<PATH TO CLONED AUTOGRAD REPOSITORY>/autograd/src
+-I<PATH TO CLONED AUTOGRAD REPOSITORY>/src
 ```
 
 Note that since the entirety of the AutoGrad library is templated, it is completely contained in `.hpp` files and so there is nothing to compile or link with. See [Limitations](#limitations) for more details.
