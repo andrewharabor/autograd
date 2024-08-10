@@ -11,6 +11,8 @@
 
 namespace AutoGrad {
 
+  // Arithmetic operations
+
   /* Addition. */
   template<FloatingPoint S>
   Variable<S> operator+(const Variable<S> &variable1, const Variable<S> &variable2) {
@@ -94,6 +96,8 @@ namespace AutoGrad {
   Variable<S> operator/(S scalar, const Variable<S> &variable) {
     return Variable<S>(variable.tape, scalar / variable.val, variable.tape.push_back(-scalar / (variable.val * variable.val), variable.index));
   }
+
+  // Exponentiation and logarithmic operations
 
   /* Exponentiation (powers). */
   template<FloatingPoint S>
@@ -185,6 +189,8 @@ namespace AutoGrad {
     return Variable<S>(variable.tape, std::log10(variable.val), variable.tape.push_back(1.0 / (variable.val * std::log(10)), variable.index));
   }
 
+  // Trigonometric functions
+
   /* Sine. */
   template<FloatingPoint S>
   Variable<S> sin(const Variable<S> &variable) {
@@ -256,6 +262,8 @@ namespace AutoGrad {
   Variable<S> arccot(const Variable<S> &variable) {
     return Variable<S>(variable.tape, (variable.val >= 0) ? (std::atan(1.0 / variable.val)) : (std::atan(1.0 / variable.val) + std::numbers::pi_v<S>), variable.tape.push_back(-1.0 / (1.0 + variable.val * variable.val), variable.index));
   }
+
+  // Hyperbolic trigonometric functions
 
   /* Hyperbolic sine. */
   template<FloatingPoint S>

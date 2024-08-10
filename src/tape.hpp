@@ -25,6 +25,8 @@ namespace AutoGrad {
     // that they can access private members and methods.
     // I know it's ugly but I don't think there is another option aside from making class internals public.
 
+    // Arithmetic operations
+
     template<FloatingPoint S>
     friend Variable<S> operator+(const Variable<S> &variable1, const Variable<S> &variable2);
 
@@ -60,6 +62,8 @@ namespace AutoGrad {
 
     template<FloatingPoint S>
     friend Variable<S> operator/(S scalar, const Variable<S> &variable);
+
+    // Exponential and logarithmic functions
 
     template<FloatingPoint S>
     friend Variable<S> pow(const Variable<S> &variable1, const Variable<S> &variable2);
@@ -103,6 +107,8 @@ namespace AutoGrad {
     template<FloatingPoint S>
     friend Variable<S> log10(const Variable<S> &variable);
 
+    // Trigonometric functions
+
     template<FloatingPoint S>
     friend Variable<S> sin(const Variable<S> &variable);
 
@@ -138,6 +144,8 @@ namespace AutoGrad {
 
     template<FloatingPoint S>
     friend Variable<S> arccot(const Variable<S> &variable);
+
+    // Hyperbolic trigonometric functions
 
     template<FloatingPoint S>
     friend Variable<S> sinh(const Variable<S> &variable);
@@ -183,6 +191,7 @@ namespace AutoGrad {
     Tape() noexcept = default; // Default constructor
 
     // Disallow copy semantics
+    // Each tape has variables bound to that specific reference so copying tapes would lead to weird behavior.
     Tape(const Tape<Scalar> &tape) noexcept = delete; // Copy constructor
     Tape<Scalar> &operator=(const Tape<Scalar> &tape) noexcept = delete; // Copy assignment operator
 
