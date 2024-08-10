@@ -22,6 +22,52 @@ namespace AutoGrad {
     friend class Tape<Scalar>;
     friend class Gradient<Scalar>;
 
+    // Comparison operators
+
+    // /* Spaceship operator (implements all relational operators). */
+    // template<FloatingPoint S>
+    // friend constexpr auto operator<=>(const Variable<S> &variable1, const Variable<S> &variable2) noexcept {
+    //   return variable1.val <=> variable2.val;
+    // }
+
+    /* Equality.
+    NOTE: this directly compares two floating-point values using `==` and is therefore unsafe. */
+    template<FloatingPoint S>
+    friend bool operator==(const Variable<S> &variable1, const Variable<S> &variable2) {
+      return variable1.val == variable2.val;
+    }
+
+    /* Inequality.
+    NOTE: this directly compares two floating-point values using `!=` and is therefore unsafe. */
+    template<FloatingPoint S>
+    friend bool operator!=(const Variable<S> &variable1, const Variable<S> &variable2) {
+      return variable1.val != variable2.val;
+    }
+
+    /* Greater than. */
+    template<FloatingPoint S>
+    friend bool operator>(const Variable<S> &variable1, const Variable<S> &variable2) {
+      return variable1.val > variable2.val;
+    }
+
+    /* Less than. */
+    template<FloatingPoint S>
+    friend bool operator<(const Variable<S> &variable1, const Variable<S> &variable2) {
+      return variable1.val < variable2.val;
+    }
+
+    /* Greater than or equal to. */
+    template<FloatingPoint S>
+    friend bool operator>=(const Variable<S> &variable1, const Variable<S> &variable2) {
+      return variable1.val >= variable2.val;
+    }
+
+    /* Less than or equal to. */
+    template<FloatingPoint S>
+    friend bool operator<=(const Variable<S> &variable1, const Variable<S> &variable2) {
+      return variable1.val <= variable2.val;
+    }
+
     // A bunch of arithmetic operations and elementary mathematical functions that have to be declared as friends so
     // that they can access private members and methods.
     // I know it's ugly but I don't think there is another option aside from making class internals public.
@@ -36,9 +82,6 @@ namespace AutoGrad {
     friend Variable<S> operator+(S scalar, const Variable<S> &variable);
 
     template<FloatingPoint S>
-    friend Variable<S> operator+(const Variable<S> &variable);
-
-    template<FloatingPoint S>
     friend Variable<S> operator-(const Variable<S> &variable1, const Variable<S> &variable2);
 
     template<FloatingPoint S>
@@ -46,9 +89,6 @@ namespace AutoGrad {
 
     template<FloatingPoint S>
     friend Variable<S> operator-(S scalar, const Variable<S> &variable);
-
-    template<FloatingPoint S>
-    friend Variable<S> operator-(const Variable<S> &variable);
 
     template<FloatingPoint S>
     friend Variable<S> operator*(const Variable<S> &variable1, const Variable<S> &variable2);
@@ -188,16 +228,101 @@ namespace AutoGrad {
   public:
 
     /* Construct a new variable object by copying the value of the given one. */
-    Variable(const Variable<Scalar> &variable) : tape(variable.tape), val{variable.val} {  // Copy constructor
+    Variable(const Variable<Scalar> &variable) noexcept : tape(variable.tape), val{variable.val} {  // Copy constructor
       index = tape.push_back(1.0, variable.index);
     }
 
     /* Construct a new variable object by moving the given one. */
-    Variable(Variable<Scalar> &&variable) = default; // Move constructor
+    Variable(Variable<Scalar> &&variable) noexcept = default; // Move constructor
 
-    // Disallow reassignment operations
-    Variable<Scalar> &operator=(const Variable<Scalar> &variable) = delete; // Copy assignment operator
-    Variable<Scalar> &operator=(Variable<Scalar> &&variable) = delete; // Move assignment operator
+    // Assignment operators
+
+    /* Reassign a variable object by copying the value of the given one. */
+    Variable<Scalar> &operator=(const Variable<Scalar> &variable) {
+      if (this != &variable) {
+        if (&tape != &variable.tape) {
+          throw std::invalid_argument("`AutoGrad::Variable`s not from the same `AutoGrad::Tape`");
+        }
+        val = variable.val;
+        index = tape.push_back(1.0, variable.index);
+      }
+      return *this;
+    }
+
+    /* Reassign a variable object by moving the given one. */
+    Variable<Scalar> &operator=(Variable<Scalar> &&variable) {
+      if (&tape != &variable.tape) {
+        throw std::invalid_argument("`AutoGrad::Variable`s not from the same `AutoGrad::Tape`");
+      }
+      val = variable.val;
+      index = variable.index;
+      return *this;
+    }
+
+    /* Reassign a variable object using a scalar. */
+    Variable<Scalar> &operator=(Scalar scalar) {
+      val = scalar;
+      index = tape.push_back();
+      return *this;
+    }
+
+    /* Addition assignment. */
+    Variable<Scalar> &operator+=(const Variable<Scalar> &variable) {
+      *this = *this + variable;
+      return *this;
+    }
+
+    /* Addition assignment. */
+    Variable<Scalar> &operator+=(Scalar scalar) {
+      *this = *this + scalar;
+      return *this;
+    }
+
+    /* Subtraction assignment. */
+    Variable<Scalar> &operator-=(const Variable<Scalar> &variable) {
+      *this = *this - variable;
+      return *this;
+    }
+
+    /* Subtraction assignment. */
+    Variable<Scalar> &operator-=(Scalar scalar) {
+      *this = *this - scalar;
+      return *this;
+    }
+
+    /* Multiplication assignment. */
+    Variable<Scalar> &operator*=(const Variable<Scalar> &variable) {
+      *this = *this * variable;
+      return *this;
+    }
+
+    /* Multiplication assignment. */
+    Variable<Scalar> &operator*=(Scalar scalar) {
+      *this = *this * scalar;
+      return *this;
+    }
+
+    /* Division assignment. */
+    Variable<Scalar> &operator/=(const Variable<Scalar> &variable) {
+      *this = *this / variable;
+      return *this;
+    }
+
+    /* Division assignment. */
+    Variable<Scalar> &operator/=(Scalar scalar) {
+      *this = *this / scalar;
+      return *this;
+    }
+
+    /* Identity. */
+    Variable<Scalar> operator+() const {
+      return Variable<Scalar>(tape, val, tape.push_back(1.0, index));
+    }
+
+    /* Negation. */
+    Variable<Scalar> operator-() const {
+      return Variable<Scalar>(tape, -val, tape.push_back(-1.0, index));
+    }
 
     /* Retrive the actual numerical value. */
     Scalar value() const {
@@ -223,7 +348,7 @@ namespace AutoGrad {
     size_t index; // Index in the computational graph held by the tape.
 
     /* Construct a variable object for a particular tape given a value and an index. */
-    Variable(Tape<Scalar> &tape_, Scalar value_, size_t index_) : tape(tape_), val{value_}, index{index_} {} // Constructor
+    Variable(Tape<Scalar> &tape_, Scalar value_, size_t index_) noexcept : tape(tape_), val{value_}, index{index_} {} // Constructor
   };
 }
 

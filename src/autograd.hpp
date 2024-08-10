@@ -32,12 +32,6 @@ namespace AutoGrad {
     return variable + scalar;
   }
 
-  /* Identity operator. */
-  template<FloatingPoint S>
-  Variable<S> operator+(const Variable<S> &variable) {
-    return Variable<S>(variable.tape, variable.val, variable.tape.push_back(1.0, variable.index));
-  }
-
   /* Subtraction. */
   template<FloatingPoint S>
   Variable<S> operator-(const Variable<S> &variable1, const Variable<S> &variable2) {
@@ -57,12 +51,6 @@ namespace AutoGrad {
   template<FloatingPoint S>
   Variable<S> operator-(S scalar, const Variable<S> &variable) {
     return Variable<S>(variable.tape, scalar - variable.val, variable.tape.push_back(-1.0, variable.index));
-  }
-
-  /* Negation. */
-  template<FloatingPoint S>
-  Variable<S> operator-(const Variable<S> &variable) {
-    return Variable<S>(variable.tape, -variable.val, variable.tape.push_back(-1.0, variable.index));
   }
 
   /* Multiplication. */
