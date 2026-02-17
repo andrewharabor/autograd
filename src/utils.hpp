@@ -6,6 +6,7 @@
 #include <cmath>
 #include <concepts>
 #include <cstddef>
+#include <numbers>
 #include <stdexcept>
 #include <utility>
 #include <vector>
