@@ -1,6 +1,6 @@
-SHELL := /usr/bin/bash
-CXX := /usr/bin/g++
-CXXFLAGS := -std=c++23 -fconcepts -g -pedantic -Wall -Wextra -Werror -Wshadow -Wconversion -Wfloat-equal -fdiagnostics-color=always -fsanitize=undefined,address
+SHELL := /bin/zsh
+CXX := /opt/homebrew/bin/g++-15
+CXXFLAGS := -std=c++23 -fconcepts -g -pedantic -Wall -Wextra -Werror -Wno-psabi -Wshadow -Wconversion -Wfloat-equal -fdiagnostics-color=always
 
 TARGET_EXEC := main
 BUILD_DIR := build
