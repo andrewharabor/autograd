@@ -1,30 +1,34 @@
-SHELL := /bin/zsh
 CXX := /usr/bin/clang++
-CXXFLAGS := -std=c++23 -g -pedantic -Wall -Wextra -Werror -Wshadow -Wfloat-equal -Wconversion -fdiagnostics-color=always -fsanitize=undefined,address
-LDFLAGS :=
-LDLIBS :=
 
-TARGET_EXEC := main
-BUILD_DIR := build
+EXEC := ex
+
 SRC_DIRS := src example
+BUILD_DIR := build
+INC_DIRS := $(shell find $(SRC_DIRS) -type d)
+
+CXX_FLAGS := -std=c++20 -g -pedantic -Wall -Wextra -Werror -Wshadow -Wfloat-equal -Wconversion -fdiagnostics-color=always -fsanitize=undefined,address
+INC_FLAGS := $(addprefix -I,$(INC_DIRS))
+CPP_FLAGS := $(INC_FLAGS) -MMD -MP
 
 SRCS := $(shell find $(SRC_DIRS) -name '*.cpp')
+HEADERS := $(shell find $(SRC_DIRS) -name '*.hpp')
 OBJS := $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:%.o=%.d)
 
-INC_DIRS := $(shell find $(SRC_DIRS) -type d)
-INC_FLAGS := $(addprefix -I,$(INC_DIRS))
-CPPFLAGS := $(INC_FLAGS) -MMD -MP
+-include $(DEPS)
 
-$(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(LDFLAGS) $(LDLIBS)
+$(EXEC): $(OBJS)
+	$(CXX) $(CXX_FLAGS) $(OBJS) -o $@
 
 $(BUILD_DIR)/%.o: %.cpp
 	mkdir -p $(dir $@)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CPP_FLAGS) $(CXX_FLAGS) -c $< -o $@
 
 .PHONY: clean
 clean:
+	rm -f $(EXEC)
 	rm -rf $(BUILD_DIR)
 
--include $(DEPS)
+.PHONY: format
+format: $(SRCS) $(HEADERS)
+	clang-format -i --verbose $^

@@ -24,13 +24,13 @@ git clone https://github.com/andrewharabor/autograd.git
 git clone git@github.com:andrewharabor/autograd.git
 ```
 
-2. Include the header file for AutoGrad in the C++ source file where you would like to use it:
+1. Include the header file for AutoGrad in the C++ source file where you would like to use it:
 
 ``` cpp
 #include <autograd.hpp>
 ```
 
-3. Make sure to tell the compiler where to look for the header file. For example, with `g++`/`gcc`, pass the following flag:
+1. Make sure to tell the compiler where to look for the header file. For example, with `clang++`/`g++`, pass the following flag:
 
 ``` bash
 -I<PATH TO CLONED AUTOGRAD REPOSITORY>/src
@@ -48,29 +48,31 @@ The file [example.cpp](/example/example.cpp) (copied below for convenience) show
 
 #include "autograd.hpp"
 
+using namespace AutoGrad;
+
 int main() {
-  AutoGrad::Tape<double> tape;
-  AutoGrad::Variable<double> x = tape.variable(0.5);
-  AutoGrad::Variable<double> y = tape.variable(4.2);
-  AutoGrad::Variable<double> z = x * y + AutoGrad::sin(x);
-  AutoGrad::Gradient<double> grad = z.gradient();
-  std::cout << std::setprecision(10);
-  std::cout << "z = " << z.value() << std::endl; // z = 2.579425539
-  std::cout << "∂z/∂x = " << grad.withRespectTo(x) << std::endl; // ∂z/∂x = 5.077582562
-  std::cout << "∂z/∂y = " << grad.withRespectTo(y) << std::endl; // ∂z/∂y = 0.5
+    Tape<double> tape;
+    Var x = tape.var(0.5);
+    Var y = tape.var(4.2);
+    Var z = x * y + sin(x);
+    Grad grad = z.grad();
+    std::cout << std::setprecision(10);
+    std::cout << "z = " << z.value() << std::endl;        // z = 2.579425539
+    std::cout << "∂z/∂x = " << grad.wrt(x) << std::endl;  // ∂z/∂x = 5.077582562
+    std::cout << "∂z/∂y = " << grad.wrt(y) << std::endl;  // ∂z/∂y = 0.5
 }
 ```
 
-Here, a `Tape` object is initialized and `Variable`s $`x = 0.5`$ and $`y = 4.2`$ are bound to it. The expression $`z = xy + sin(x)`$ and the partial derivatives $`\frac{\partial z}{\partial x}`$ and $`\frac{\partial z}{\partial y}`$ are computed. Notice how the gradient is computed once and stored in a `Gradient` object. This allows the partial derivative of the output variable with respect to any input variable to be retrieved in constant time.
+Here, a `Tape` object is initialized and `Var`s $`x = 0.5`$ and $`y = 4.2`$ are bound to it. The expression $`z = xy + sin(x)`$ and the partial derivatives $`\frac{\partial z}{\partial x}`$ and $`\frac{\partial z}{\partial y}`$ are computed. Notice how the gradient is computed once and stored in a `Grad` object. This allows the partial derivative of the output variable with respect to any input variable to be retrieved in constant time.
 
 To run the example yourself, clone the repository as described in [Usage](#usage) and `cd` into the `autograd` directory. Then run the following commands:
 
 ``` bash
-make
-./build/main
+make -j
+./ex
 ```
 
-To clean up the output directory `build`, run:
+Afterwards to clean up all build artifacts, run:
 
 ``` bash
 make clean
